@@ -1,0 +1,60 @@
+CREATE TABLE IF NOT EXISTS Publisher (
+    Email VARCHAR(255) PRIMARY KEY,
+    Name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Author (
+    Email VARCHAR(255) PRIMARY KEY,
+    Name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Book (
+    ISBN VARCHAR(255) PRIMARY KEY,
+    Title VARCHAR(255) NOT NULL,
+    Price DECIMAL(10, 2) NOT NULL,
+    PageCount INT,
+    Genre VARCHAR(100),
+    Publisher_Email VARCHAR(255),
+    FOREIGN KEY (Publisher_Email) REFERENCES Publisher(Email)
+);
+
+CREATE TABLE IF NOT EXISTS Book_Author (
+    ISBN VARCHAR(255),
+    Author_Email VARCHAR(255),
+    PRIMARY KEY (ISBN, Author_Email),
+    FOREIGN KEY (ISBN) REFERENCES Book(ISBN),
+    FOREIGN KEY (Author_Email) REFERENCES Author(Email)
+);
+
+CREATE TABLE IF NOT EXISTS User (
+    Username VARCHAR(255) PRIMARY KEY,
+    Phone_Number VARCHAR(20),
+    Password VARCHAR(255) NOT NULL,
+    Address TEXT,
+    Email VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS Transaction (
+    ID VARCHAR(255) PRIMARY KEY,
+    Date DATE NOT NULL,
+    Return_Date DATE,
+    Price DECIMAL(10, 2) NOT NULL,
+    Username VARCHAR(255),
+    FOREIGN KEY (Username) REFERENCES User(Username)
+);
+
+CREATE TABLE IF NOT EXISTS Book_Transaction (
+    ISBN VARCHAR(255),
+    Transaction_ID VARCHAR(255),
+    PRIMARY KEY (ISBN, Transaction_ID),
+    FOREIGN KEY (ISBN) REFERENCES Book(ISBN),
+    FOREIGN KEY (Transaction_ID) REFERENCES Transaction(ID)
+);
+
+CREATE TABLE IF NOT EXISTS Book_User (
+    ISBN VARCHAR(255),
+    Username VARCHAR(255),
+    PRIMARY KEY (ISBN, Username),
+    FOREIGN KEY (ISBN) REFERENCES Book(ISBN),
+    FOREIGN KEY (Username) REFERENCES User(Username)
+);
