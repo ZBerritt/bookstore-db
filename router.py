@@ -21,4 +21,3 @@ def status():
         return jsonify({'status': 'success', 'tables': tables})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)})
-

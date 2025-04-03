@@ -27,25 +27,26 @@ CREATE TABLE IF NOT EXISTS Book_Author (
 );
 
 CREATE TABLE IF NOT EXISTS User (
-    Username VARCHAR(255) PRIMARY KEY,
-    Phone_Number VARCHAR(20),
+    ID INT PRIMARY KEY,
+    Username VARCHAR(255) NOT NULL,
+    Email VARCHAR(255) NOT NULL,
     Password VARCHAR(255) NOT NULL,
-    Address TEXT,
-    Email VARCHAR(255)
+    Phone_Number VARCHAR(20),
+    Address TEXT
 );
 
 CREATE TABLE IF NOT EXISTS Transaction (
-    ID VARCHAR(255) PRIMARY KEY,
+    ID INT PRIMARY KEY,
     Date DATE NOT NULL,
     Return_Date DATE,
     Price DECIMAL(10, 2) NOT NULL,
-    Username VARCHAR(255),
-    FOREIGN KEY (Username) REFERENCES User(Username)
+    UserID INT,
+    FOREIGN KEY (UserID) REFERENCES User(ID)
 );
 
 CREATE TABLE IF NOT EXISTS Book_Transaction (
     ISBN VARCHAR(255),
-    Transaction_ID VARCHAR(255),
+    Transaction_ID INT,
     PRIMARY KEY (ISBN, Transaction_ID),
     FOREIGN KEY (ISBN) REFERENCES Book(ISBN),
     FOREIGN KEY (Transaction_ID) REFERENCES Transaction(ID)
@@ -53,8 +54,8 @@ CREATE TABLE IF NOT EXISTS Book_Transaction (
 
 CREATE TABLE IF NOT EXISTS Book_User (
     ISBN VARCHAR(255),
-    Username VARCHAR(255),
-    PRIMARY KEY (ISBN, Username),
+    UserID INT,
+    PRIMARY KEY (ISBN, UserID),
     FOREIGN KEY (ISBN) REFERENCES Book(ISBN),
-    FOREIGN KEY (Username) REFERENCES User(Username)
+    FOREIGN KEY (UserID) REFERENCES User(ID)
 );
