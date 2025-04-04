@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Delete User{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-lg p-5 text-center">
+        <div class="card-body">
+            <h2 class="card-title">Delete User</h2>
+            {% if error %}
+                <p class="text-danger">{{ error }}</p>
+            {% endif %}
+            <form method="POST">
+                <p>Are you sure you want to delete your account?</p>
+                <button type="submit" class="btn btn-primary">Delete Account</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

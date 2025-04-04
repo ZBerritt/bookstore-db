@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from flask_bootstrap import Bootstrap5
-from database import get_db, user_login, user_register
+from database import get_db, user_login, user_register, user_delete
 
 app = Flask(__name__)
 bootstrap = Bootstrap5(app)
@@ -68,6 +68,17 @@ def dashboard():
     if "user_id" not in session:
         return redirect(url_for("login"))
     return render_template("dashboard.html", username=session["username"])
+
+@app.route("/delete", methods=["GET", "POST"])
+def delete():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    elif request.method == "POST":
+        user_delete(session["user_id"])
+        session.clear()
+        return redirect(url_for("login"))
+    else:
+        return render_template("delete.html")
 
 
 @app.route("/logout")

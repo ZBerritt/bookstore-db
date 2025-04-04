@@ -62,3 +62,9 @@ def user_register(username, password, email, address, phone_number):
     
     cursor.execute("SELECT ID, Username FROM User WHERE Username = %s", (username,))
     return cursor.fetchone()
+
+def user_delete(id):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("DELETE FROM User WHERE ID = %s;", (id,))
+    db.commit()
