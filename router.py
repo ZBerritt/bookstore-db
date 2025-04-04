@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from flask_bootstrap import Bootstrap5
-from database import get_db, user_login
+from database import get_db, user_login, user_register
 
 app = Flask(__name__)
 bootstrap = Bootstrap5(app)
@@ -36,8 +36,32 @@ def login():
             return redirect(url_for("dashboard"))  # Redirect to dashboard
         
         return render_template("login.html", error="Invalid credentials")
+    elif "user_id" in session:
+        return redirect(url_for("dashboard"))
+    else:
+        return render_template("login.html")
 
-    return render_template("login.html")
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        try:
+            username = request.form["username"]
+            email = request.form["email"]
+            password = request.form["password"]
+            address = request.form["address"]
+            phone = request.form["phone"]
+            
+            # Register in DB
+            user = user_register(username, password, email, address, phone)
+            session["user_id"] = user[0]
+            session["username"] = user[1]
+            return redirect(url_for("dashboard"))
+        except Exception as err:
+            return render_template("register.html", error=err)
+    elif "user_id" in session:
+        return redirect(url_for("dashboard"))
+    else:
+        return render_template("register.html")
 
 @app.route("/dashboard")
 def dashboard():

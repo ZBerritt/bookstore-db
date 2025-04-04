@@ -4,8 +4,8 @@ import hashlib
 def get_db():
     return mysql.connector.connect(
         host='localhost',
-        user='bookstore_user',
-        password='SecurePassword',
+        user='root',
+        password='CoolPassword',
         port='3306',
         database='Bookstore'
     )
@@ -21,22 +21,44 @@ def init_db():
                 cursor.execute(f.read())
                 
 def user_login(username, password):
-    #password_hash = hashlib.sha256(password.encode()).hexdigest()
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
     
     db = get_db()
     cursor = db.cursor(dictionary=True)
     
-    cursor.execute("SELECT * FROM User WHERE Username = %s AND Password = %s", (username, password))
+    cursor.execute("SELECT ID, Username FROM User WHERE Username = %s AND Password = %s", (username, hashed_password))
     user = cursor.fetchone()
     
     cursor.close()
     db.close()
     
     return user
-
-    #with get_db() as db, db.cursor() as cursor:
-    #    cursor.execute("SELECT * FROM User WHERE Username = %s and Password = %s", (username, password_hash))
             
         
-def user_register():
-    pass
+def user_register(username, password, email, address, phone_number):
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT COUNT(*) FROM User WHERE Username = %s", (username,))
+    if cursor.fetchone()[0] > 0:
+        raise ValueError("Username already exists.")
+    
+    # Check if the email already exists
+    cursor.execute("SELECT COUNT(*) FROM User WHERE Email = %s", (email,))
+    if cursor.fetchone()[0] > 0:
+        raise ValueError("Email already registered.")
+    
+    cursor.execute("SELECT MAX(ID) FROM User")
+    max_id = cursor.fetchone()[0]
+    new_id = max_id + 1 if max_id is not None else 1
+    
+    # Insert the new user
+    cursor.execute("""
+            INSERT INTO User (ID, Username, Password, Email, Address, Phone_Number)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (new_id, username, hashed_password, email, address, phone_number))
+    
+    db.commit()
+    
+    cursor.execute("SELECT ID, Username FROM User WHERE Username = %s", (username,))
+    return cursor.fetchone()
