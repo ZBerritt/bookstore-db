@@ -1,11 +1,12 @@
+import os
 import mysql.connector
 import hashlib
 
 def get_db():
     return mysql.connector.connect(
         host='localhost',
-        user='root',
-        password='CoolPassword',
+        user=os.environ["DATABASE_USER"],
+        password=os.environ["DATABASE_PASSWORD"],
         port='3306',
         database='Bookstore'
     )
