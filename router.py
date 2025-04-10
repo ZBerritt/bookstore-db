@@ -79,7 +79,16 @@ def delete():
         return redirect(url_for("login"))
     else:
         return render_template("delete.html")
-
+    
+@app.route("/shop")
+def shop():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM book")
+    books = cursor.fetchall()
+    print(books)
+    db.close()
+    return render_template("books.html", books=books)
 
 @app.route("/logout")
 def logout():

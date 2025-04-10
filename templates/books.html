@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Bookstore{% endblock %}
+
+{% block content %}
+<h2 class="mb-4 text-center">Welcome to Our Bookstore</h2>
+<div class="row">
+    {% for book in books %}
+    <div class="col-md-4 mb-4 d-flex align-items-stretch">
+        <div class="card p-3 shadow">
+            <div class="card-body">
+                <!-- https://openlibrary.org/dev/docs/api/covers -->
+                <img src="https://covers.openlibrary.org/b/isbn/{{ book.ISBN }}-M.jpg" />
+                <h5 class="card-title">{{ book.Title }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ book.Author }}</h6>
+                <p class="card-text">{{ book.Genre }}</p>
+            </div>
+            <div class="card-footer text-end">
+                <strong>${{ "%.2f"|format(book.Price) }}</strong>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

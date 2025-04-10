@@ -59,10 +59,10 @@ INSERT INTO Book (ISBN, Title, Price, PageCount, Genre, Publisher_Email) VALUES
 ('9781635575606', 'A Court of Wings and Ruin', 16.99, 699, 'Fantasy', 'release@bloomberg.net'),
 ('9781635575620', 'A Court of Frost and Starlight', 16.99, 272, 'Fantasy', 'release@bloomberg.net'),
 ('9781635577990', 'A Court of Silver Flames', 16.99, 768, 'Fantasy', 'release@bloomberg.net'),
-('9781781100486', 'Harry Potter and the Sorcerer''s Stone', 16.99, 309, 'Fantasy', 'contact@bloomsbury.com'),
+('9780545790352', 'Harry Potter and the Sorcerer''s Stone', 16.99, 309, 'Fantasy', 'contact@bloomsbury.com'),
 ('9781781100509', 'Harry Potter and the Chamber of Secrets', 16.99, 341, 'Fantasy', 'contact@bloomsbury.com'),
 ('9781781100516', 'Harry Potter and the Prisoner of Azkaban', 16.99, 435, 'Fantasy', 'contact@bloomsbury.com'),
-('9781546154419', 'Harry Potter and the Goblet of Fire', 16.99, 734, 'Fantasy', 'contact@bloomsbury.com'),
+('9781408865422', 'Harry Potter and the Goblet of Fire', 16.99, 734, 'Fantasy', 'contact@bloomsbury.com'),
 ('9781781100530', 'Harry Potter and the Order of the Phoenix', 16.99, 870, 'Fantasy', 'contact@bloomsbury.com'),
 ('9781781100547', 'Harry Potter and the Half-Blood Prince', 16.99, 652, 'Fantasy', 'contact@bloomsbury.com'),
 ('9781781102435', 'Harry Potter and the Deathly Hallows', 16.99, 759, 'Fantasy', 'contact@bloomsbury.com');
