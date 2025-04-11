@@ -4,28 +4,67 @@
 
 {% block content %}
 <h2 class="mb-4 text-center">Welcome to Our Bookstore</h2>
-<div class="row">
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
     {% for book in books %}
-    <div class="col-md-4 mb-4 d-flex align-items-stretch">
-        <div class="card p-3 shadow">
-            <div class="card-body">
-                <img src="https://covers.openlibrary.org/b/isbn/{{ book.ISBN }}-M.jpg" class="img-fluid" />
-                <h5 class="card-title">{{ book.Title }}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">{{ book.Author }}</h6>
-                <p class="card-text">{{ book.Genre }}</p>
+    <div class="col">
+        <div class="card h-100 shadow">
+            <div class="image-container p-3">
+                <img src="https://covers.openlibrary.org/b/isbn/{{ book.ISBN }}-L.jpg" class="img-fluid book-image" alt="{{ book.Title }}">
             </div>
-            <div class="card-footer text-end">
-                <strong>${{ "%.2f"|format(book.Price) }}</strong>
-                <form method="POST" action="/add_to_cart" class="add-to-cart mt-2">
-                    <input type="hidden" name="isbn" value="{{ book.ISBN }}">
-                    <input type="hidden" name="quantity" value="1">
-                    <button type="submit" class="btn btn-primary">Add to Cart</button>
-                </form>
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title text-truncate" title="{{ book.Title }}">{{ book.Title }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted text-truncate" title="{{ book.Author }}">{{ book.Author }}</h6>
+                <p class="card-text small">{{ book.Genre }}</p>
+                <div class="mt-auto pt-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fs-5 fw-bold">${{ "%.2f"|format(book.Price) }}</span>
+                        <form method="POST" action="/add_to_cart" class="add-to-cart">
+                            <input type="hidden" name="isbn" value="{{ book.ISBN }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="bi bi-cart-plus"></i> Add
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     {% endfor %}
 </div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.book-image {
+    width: 100%;
+    height: 180px;
+    object-fit: contain;
+}
+
+.image-container {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+.card-title, .card-subtitle {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;
+}
+</style>
 {% endblock %}
 
 {% block scripts %}
