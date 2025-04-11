@@ -8,7 +8,7 @@ def get_db():
         user=os.environ["DATABASE_USER"],
         password=os.environ["DATABASE_PASSWORD"],
         port='3306',
-        database='Bookstore'
+        database='bookstore'
     )
     
 def init_db():

@@ -9,17 +9,63 @@
     <div class="col-md-4 mb-4 d-flex align-items-stretch">
         <div class="card p-3 shadow">
             <div class="card-body">
-                <!-- https://openlibrary.org/dev/docs/api/covers -->
-                <img src="https://covers.openlibrary.org/b/isbn/{{ book.ISBN }}-M.jpg" />
+                <img src="https://covers.openlibrary.org/b/isbn/{{ book.ISBN }}-M.jpg" class="img-fluid" />
                 <h5 class="card-title">{{ book.Title }}</h5>
                 <h6 class="card-subtitle mb-2 text-muted">{{ book.Author }}</h6>
                 <p class="card-text">{{ book.Genre }}</p>
             </div>
             <div class="card-footer text-end">
                 <strong>${{ "%.2f"|format(book.Price) }}</strong>
+                <form method="POST" action="/add_to_cart" class="add-to-cart mt-2">
+                    <input type="hidden" name="isbn" value="{{ book.ISBN }}">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="btn btn-primary">Add to Cart</button>
+                </form>
             </div>
         </div>
     </div>
     {% endfor %}
 </div>
+<div id="message-container" style="position: fixed; top: 10px; right: 10px; z-index: 9999;"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const forms = document.querySelectorAll("form.add-to-cart");
+    forms.forEach(form => {
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: "POST",
+                body: formData,
+                headers: {"X-Requested-With": "XMLHttpRequest"}
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    displayMessage(data.message);
+                } else {
+                    displayMessage(data.message, "danger");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        });
+    });
+});
+
+function displayMessage(message, type="success") {
+    const container = document.getElementById("message-container");
+    const msgDiv = document.createElement("div");
+    msgDiv.className = `alert alert-${type}`;
+    msgDiv.textContent = message;
+    container.appendChild(msgDiv);
+    setTimeout(() => {
+        msgDiv.remove();
+    }, 3000);
+}
+</script>
 {% endblock %}

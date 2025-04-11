@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Your Cart{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Your Cart</h2>
+    {% if cart and cart|length > 0 %}
+        <table class="table table-dark table-hover mt-3">
+            <thead>
+                <tr>
+                    <th>Book</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th>Modify</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set ns = namespace(total=0.0) %}
+                {% for item in cart %}
+                    {% set item_price = (item["price"]|default(0))|float %}
+                    {% set item_quantity = item["quantity"]|int %}
+                    {% set item_total = item_quantity * item_price %}
+                    {% set ns.total = ns.total + item_total %}
+                    <tr data-isbn="{{ item['isbn'] }}">
+                        <td>{{ item["title"]|default("Unknown") }}</td>
+                        <td>{{ item_quantity }}</td>
+                        <td>${{ '%.2f'|format(item_price) }}</td>
+                        <td>${{ '%.2f'|format(item_total) }}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm remove-item" data-isbn="{{ item['isbn'] }}">Remove</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="4" class="text-end"><strong>Overall Total:</strong></td>
+                    <td><strong>${{ '%.2f'|format(ns.total) }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        <a href="/checkout" class="btn btn-success mt-3">Proceed to Checkout</a>
+    {% else %}
+        <p>Your cart is empty.</p>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const removeButtons = document.querySelectorAll(".remove-item");
+    removeButtons.forEach(button => {
+        button.addEventListener("click", function() {
+            const isbn = this.getAttribute("data-isbn");
+            fetch("/remove_from_cart", {
+                method: "POST",
+                body: new URLSearchParams({ isbn: isbn }),
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    const row = this.closest("tr");
+                    row.parentNode.removeChild(row);
+                    location.reload(); // Reload page to recalc totals
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
