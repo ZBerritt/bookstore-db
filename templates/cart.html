@@ -46,34 +46,31 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const removeButtons = document.querySelectorAll(".remove-item");
-    removeButtons.forEach(button => {
-        button.addEventListener("click", function() {
-            const isbn = this.getAttribute("data-isbn");
-            fetch("/remove_from_cart", {
-                method: "POST",
-                body: new URLSearchParams({ isbn: isbn }),
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest",
-                    "Content-Type": "application/x-www-form-urlencoded"
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
+$(document).ready(function() {
+    $(".remove-item").on("click", function() {
+        const isbn = $(this).data("isbn");
+
+        $.ajax({
+            type: "POST",
+            url: "/remove_from_cart",
+            data: { isbn: isbn },
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            },
+            success: function(data) {
                 if (data.status === "success") {
-                    const row = this.closest("tr");
-                    row.parentNode.removeChild(row);
-                    location.reload(); // Reload page to recalc totals
+                    $(event.target).closest("tr").remove();
+                    location.reload(); // Reload to update totals
                 } else {
                     alert(data.message);
                 }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-            });
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", error);
+            }
         });
     });
 });
 </script>
+    
 {% endblock %}

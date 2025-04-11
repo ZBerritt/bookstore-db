@@ -1,6 +1,7 @@
 import os
 import mysql.connector
 import hashlib
+from datetime import datetime
 
 def get_db():
     return mysql.connector.connect(
@@ -10,16 +11,6 @@ def get_db():
         port='3306',
         database='bookstore'
     )
-    
-def init_db():
-    with get_db() as db, db.cursor() as cursor:
-            with open('scripts/setup.sql', 'r') as f:
-                cursor.execute(f.read())
-    
-    # Add sample data
-    with get_db() as db, db.cursor() as cursor:
-            with open('scripts/sample-data.sql', 'r') as f:
-                cursor.execute(f.read())
                 
 def user_login(username, password):
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
@@ -68,4 +59,29 @@ def user_delete(id):
     db = get_db()
     cursor = db.cursor()
     cursor.execute("DELETE FROM User WHERE ID = %s;", (id,))
+    db.commit()
+    
+def get_user_info(id):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT Username, Email, Address, Phone_Number FROM User WHERE ID = %s;", (id,))
+    return cursor.fetchone()
+
+def start_transaction(user_id, cart):
+    total_price = sum(n["price"] for n in cart)
+    books = [ (n["isbn"], n["quantity"]) for n in cart ]
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT MAX(ID) FROM Transaction")
+    max_id = cursor.fetchone()[0]
+    new_id = max_id + 1 if max_id is not None else 1
+    cursor.execute("""
+            INSERT INTO Transaction (ID, Date, Price, UserID)
+            VALUES (%s, %s, %s, %s)
+        """, (new_id, datetime.now(), total_price, user_id))
+    for book in books:
+        cursor.execute("""
+                INSERT INTO Book_Transaction (ISBN, Transaction_ID, Quantity)
+                VALUES (%s, %s, %s)
+            """, (book[0], new_id, book[1]))
     db.commit()

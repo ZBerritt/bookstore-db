@@ -1,10 +1,9 @@
-from flask import Flask, render_template, jsonify, request, session, redirect, url_for
-from flask_bootstrap import Bootstrap5
-from database import get_db, user_login, user_register, user_delete
+import os
+from flask import Flask, render_template, jsonify, request, session, redirect, url_for, flash
+from database import get_db, user_login, user_register, user_delete, get_user_info, start_transaction
 
 app = Flask(__name__)
-bootstrap = Bootstrap5(app)
-app.secret_key = 'key'
+app.secret_key = os.environ["APP_SECRET"]
 
 
 @app.route("/")
@@ -91,9 +90,8 @@ def shop():
     cursor = db.cursor(dictionary=True)
     cursor.execute("SELECT * FROM Book")
     books = cursor.fetchall()
-    print(books)
     db.close()
-    return render_template("books.html", books=books)
+    return render_template("shop.html", books=books)
 
 @app.route("/add_to_cart", methods=["POST"])
 def add_to_cart():
@@ -177,11 +175,33 @@ def cart():
     cart_items = session.get("cart", [])
     return render_template("cart.html", cart=cart_items)
 
+@app.route("/checkout", methods=["GET", "POST"])
+def checkout():
+    cart_items = session.get("cart", [])
+    if request.method == "POST":
+        if "user_id" not in session:
+            return jsonify({"status": "error", "message": "Not authenticated"}), 401
+        if len(cart_items) == 0:
+            return jsonify({"status": "error", "message": "Empty cart"}), 400
+        start_transaction(session["user_id"], cart_items)
+        session.pop("cart", None)
+        flash('Purchase Successful!', 'success')
+        return redirect(url_for("dashboard"))
+    else:
+        if "user_id" not in session:
+            return redirect(url_for("login"))
+        if len(cart_items) == 0:
+            return redirect(url_for("shop"))
+        user_info = get_user_info(id=session["user_id"])
+        return render_template("checkout.html", cart=cart_items, user=user_info)
+        
+   
+     
 # Temporary
-@app.route("/clear_cart")
-def clear_cart():
-    session.pop("cart", None)
-    return redirect(url_for("cart"))
+# @app.route("/clear_cart")
+# def clear_cart():
+#     session.pop("cart", None)
+#     return redirect(url_for("cart"))
 
 @app.route("/logout")
 def logout():

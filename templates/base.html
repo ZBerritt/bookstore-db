@@ -1,30 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}My Flask App{% endblock %}</title>
-    
-    {{ bootstrap.load_css() }}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <title>{% block title %}Bookstore{% endblock %}</title>
 
-    <style>
-        body {
-            background-color: #121212;
-            color: #e0e0e0;
-        }
-        .card {
-            background-color: #1e1e1e;
-            color: #ffffff;
-            width: 60%;
-        }
-        .navbar-nav li {
-            margin-left: 10px;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<body class="bg-dark text-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">Bookstore</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -34,9 +20,9 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 {% if session.username %}
                     <ul class="navbar-nav me-auto">
-                        <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/shop">Shop</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/cart">Cart</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/dashboard"><i class="bi bi-grid"></i> Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/shop"><i class="bi bi-book"></i> Shop</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/cart"><i class="bi bi-cart"></i> Cart</a></li>
                     </ul>
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
@@ -64,7 +50,38 @@
         {% block content %}{% endblock %}
     </div>
     
-    {{ bootstrap.load_js() }}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+    <script>
+        function displayMessage(message, type = "success") {
+            const $container = $("#message-container");
+            const $msgDiv = $(`
+                <div class="alert alert-${type}" role="alert">
+                    ${message}
+                </div>
+            `);
+            $container.append($msgDiv);
+            setTimeout(() => {
+                $msgDiv.fadeOut(300, function() {
+                    $(this).remove();
+                });
+            }, 3000);
+        }
+    
+        $(document).ready(function () {
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        displayMessage({{ message|tojson }}, {{ category|tojson }});
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        });
+    </script>
+    
     {% block scripts %}{% endblock %}
+    
+     
+<div id="message-container" style="position: fixed; top: 10px; right: 10px; z-index: 9999;"></div>
 </body>
 </html>

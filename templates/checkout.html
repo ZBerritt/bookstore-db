@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Checkout</h2>
+
+    <div class="row mt-4">
+        <!-- Order Summary -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Order Summary</h4>
+                </div>
+                <div class="card-body">
+                    {% if cart and cart|length > 0 %}
+                        <table class="table table-dark table-sm">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Item</th>
+                                    <th scope="col">Qty</th>
+                                    <th scope="col" class="text-end">Price</th>
+                                    <th scope="col" class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set ns = namespace(total=0.0) %}
+                                {% for item in cart %}
+                                    {% set item_price = (item["price"]|default(0))|float %}
+                                    {% set item_quantity = item["quantity"]|int %}
+                                    {% set item_total = item_quantity * item_price %}
+                                    {% set ns.total = ns.total + item_total %}
+                                    <tr>
+                                        <td>{{ item["title"]|default("Unknown") }}</td>
+                                        <td>{{ item_quantity }}</td>
+                                        <td class="text-end">${{ '%.2f'|format(item_price) }}</td>
+                                        <td class="text-end">${{ '%.2f'|format(item_total) }}</td>
+                                    </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                                    <td class="text-end"><strong>${{ '%.2f'|format(ns.total) }}</strong></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end"><strong>${{ '%.2f'|format(ns.total) }}</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>Your cart is empty.</p>
+                        <a href="/shop" class="btn btn-primary">Browse Books</a>
+                    {% endif %}
+                </div>
+            </div>
+        
+        <!-- Order Details -->
+        <div class="row">
+            <div class="col">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Shipping Information</h4>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Your order will be shipped to:</strong></p>
+                        <p>{{ user.Address }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Contact</h4>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Email:</strong> {{ user.Email }}</p>
+                        <p><strong>Phone Number:</strong> {{ user.Phone_Number }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            
+            {% if cart and cart|length > 0 %}  
+                <div class="d-grid gap-2">
+                    <form method="post">
+                        <button type="submit" class="btn btn-primary btn-lg" id="place-order-btn">Place Order</button>
+                        <a href="/cart" class="btn btn-outline-secondary btn-lg">Return to Cart</a>
+                    </form>
+                </div>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
