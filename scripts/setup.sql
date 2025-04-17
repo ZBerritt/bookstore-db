@@ -27,16 +27,18 @@ CREATE TABLE IF NOT EXISTS Book_Author (
 );
 
 CREATE TABLE IF NOT EXISTS User (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
+    ID INT PRIMARY KEY,
     Username VARCHAR(255) NOT NULL,
     Email VARCHAR(255) NOT NULL,
     Password VARCHAR(255) NOT NULL,
+    Role Enum("customer", "admin", "author", "publisher") NOT NULL DEFAULT "customer",
+    Status Enum("active", "inactive", "terminated") NOT NULL DEFAULT "active",
     Phone_Number VARCHAR(20),
     Address TEXT
 );
 
 CREATE TABLE IF NOT EXISTS Transaction (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
+    ID INT PRIMARY KEY,
     Date DATE NOT NULL,
     Return_Date DATE,
     Price DECIMAL(10, 2) NOT NULL,

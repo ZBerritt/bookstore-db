@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for, flash
-from database import get_db, user_login, user_register, user_delete, get_user_info, start_transaction
+from database import get_db, user_login, user_register, user_delete, get_user_info, start_transaction, admin_get_books, admin_get_users, admin_get_transactions
 
 app = Flask(__name__)
 app.secret_key = os.environ["APP_SECRET"]
@@ -37,6 +37,7 @@ def login():
         if user:
             session["user_id"] = user["ID"]  
             session["username"] = user["Username"]
+            session["role"] = user["Role"]
             return redirect(url_for("shop"))  
         
         return render_template("login.html", error="Invalid credentials")
@@ -57,8 +58,9 @@ def register():
             
             # Register in DB
             user = user_register(username, password, email, address, phone)
-            session["user_id"] = user[0]
-            session["username"] = user[1]
+            session["user_id"] = user["ID"]
+            session["username"] = user["Username"]
+            session["role"] = user["Role"]
             return redirect(url_for("shop"))
         except Exception as err:
             return render_template("register.html", error=err)
@@ -71,6 +73,7 @@ def register():
 def dashboard():
     if "user_id" not in session:
         return redirect(url_for("login"))
+    print(session)
     return render_template("dashboard.html", username=session["username"])
 
 @app.route("/delete", methods=["GET", "POST"])
@@ -195,13 +198,14 @@ def checkout():
         user_info = get_user_info(id=session["user_id"])
         return render_template("checkout.html", cart=cart_items, user=user_info)
         
-   
-     
-# Temporary
-# @app.route("/clear_cart")
-# def clear_cart():
-#     session.pop("cart", None)
-#     return redirect(url_for("cart"))
+@app.route("/admin")
+def admin():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    info = get_user_info(session["user_id"])
+    if info["Role"] != "admin":
+        return redirect(url_for("shop"))
+    return render_template("admin.html", books=admin_get_books(), users=admin_get_users(), transactions=admin_get_transactions())
 
 @app.route("/logout")
 def logout():

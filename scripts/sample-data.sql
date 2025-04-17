@@ -1,6 +1,11 @@
 -- Use this new sample data instead, it contains all the data for the books and stuff 
 -- but doesn't create anything unnecessary like fake users/transactions. Good for when changing schema
 
+-- Admin User
+INSERT INTO User (ID, Username, Phone_Number, Password, Role, Address, Email) VALUES
+(0, 'admin', '800-948-8488', 'cd916028a2d8a1b901e831246dd5b9b4d3832786ddc63bbf5af4b50d9fc98f50',
+ 'admin', 'The Internet', 'bookstore@chillgroup.com');
+
 -- Insert Publishers
 INSERT INTO Publisher (Email, Name) VALUES
 ('contact@bloomsbury.com', 'Bloomsbury'),
@@ -85,10 +90,10 @@ INSERT INTO Book_Author (ISBN, Author_Email) VALUES
 ('9781635575606', 'smaas@gmail.com'),
 ('9781635575620', 'smaas@gmail.com'),
 ('9781635577990', 'smaas@gmail.com'),
-('9781781100486', 'jkrowling@gmail.com'),
+('9781408865422', 'jkrowling@gmail.com'),
 ('9781781100509', 'jkrowling@gmail.com'),
 ('9781781100516', 'jkrowling@gmail.com'),
-('9781546154419', 'jkrowling@gmail.com'),
+('9780545790352', 'jkrowling@gmail.com'),
 ('9781781100530', 'jkrowling@gmail.com'),
 ('9781781100547', 'jkrowling@gmail.com'),
 ('9781781102435', 'jkrowling@gmail.com');

@@ -32,7 +32,14 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
                                 <li><a class="dropdown-item" href="/logout">Logout</a></li>
-                                <li><a class="dropdown-item" href="/delete">Delete Account</a></li>
+                                {% if session.role == 'admin' %}
+                                    <li><a class="dropdown-item" href="/admin"><i class="bi bi-shield-lock"></i> Admin</a></li>
+                                {% elif session.role == 'author' %}
+                                    <li><a class="dropdown-item" href="/author">Author</a></li>
+                                {% else %}
+                                    <li><a class="dropdown-item" href="/delete">Delete Account</a></li>
+                                {% endif %}
+
                             </ul>
                         </li>
                     </ul>
