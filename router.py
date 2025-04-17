@@ -89,12 +89,71 @@ def delete():
     
 @app.route("/shop")
 def shop():
-    db = get_db()
+    # Read filters
+    q         = request.args.get("q", "").strip()
+    genre     = request.args.get("genre", "")
+    min_price = request.args.get("min_price", "")
+    max_price = request.args.get("max_price", "")
+
+    # Build WHERE clauses
+    conditions = []
+    params     = []
+    if q:
+        conditions.append("(b.Title LIKE %s OR a.Name LIKE %s)")
+        like_q = f"%{q}%"
+        params += [like_q, like_q]
+    if genre:
+        conditions.append("b.Genre = %s")
+        params.append(genre)
+    if min_price:
+        conditions.append("b.Price >= %s")
+        params.append(min_price)
+    if max_price:
+        conditions.append("b.Price <= %s")
+        params.append(max_price)
+
+    where = " AND ".join(conditions)
+
+    # Query with JOIN + GROUP_CONCAT for authors
+    sql = """
+    SELECT
+      b.ISBN,
+      b.Title,
+      GROUP_CONCAT(a.Name SEPARATOR ', ') AS Authors,
+      b.Genre,
+      b.Price
+    FROM Book b
+    LEFT JOIN Book_Author ba ON ba.ISBN = b.ISBN
+    LEFT JOIN Author a       ON a.Email = ba.Author_Email
+    """
+    if where:
+        sql += " WHERE " + where
+    sql += " GROUP BY b.ISBN;"
+
+    db     = get_db()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM Book")
-    books = cursor.fetchall()
+    cursor.execute(sql, tuple(params))
+    books  = cursor.fetchall()
+
+    # Find distinct genres for the filter dropdown
+    cursor.execute("SELECT DISTINCT Genre FROM Book;")
+    genres = [r["Genre"] for r in cursor.fetchall()]
+
+    cursor.close()
     db.close()
-    return render_template("shop.html", books=books)
+
+    return render_template(
+        "shop.html",
+        books=books,
+        genres=genres,
+        filters={
+            "q": q,
+            "genre": genre,
+            "min_price": min_price,
+            "max_price": max_price
+        }
+    )
+
 
 @app.route("/add_to_cart", methods=["POST"])
 def add_to_cart():
