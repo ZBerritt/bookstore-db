@@ -268,5 +268,7 @@ def admin():
 
 @app.route("/logout")
 def logout():
+    cart = session.get("cart", [])
     session.clear()
+    session["cart"] = cart
     return redirect(url_for("login"))
